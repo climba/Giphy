@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="assets/css/styles.css" >
+    <meta name="author" content="Mike White">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    
+    body {
+    background-image: url("https://giphy.com/static/img/giphy_logo_square_social.png");
+    background-repeat : repeat;
+    }
+    /* Style the navbar */
+    #navbar {
+        overflow: hidden;
+        background-color: #333;
+        width: 960px;
+        margin: 0 auto;
+        /* position: fixed;
+        top: 0; */
+    }
+
+    .nav-left {
+        width: 450px;
+        float: left;
+    }
+
+    .nav-right {
+        width: 450px;
+        float: left;
+        text-align: right;
+    }
+    
+    /* Navbar links */
+    #navbar h2 {
+        width: 500px;
+        float: left;
+        display: block;
+        color: #f2f2f2;
+        text-align: left;
+        padding: 14px;
+        text-decoration: none;
+    }
+
+    .btn-row {
+        width: 900px;
+        float: left;
+        padding: 20px;
+        /* text-align: right; */
+    }
+    
+
+
+    .container {
+        width: 960px;
+        margin: 0 auto;
+        color: #F8F9FA;
+        background-color: rgba(56, 56, 56, 0.9);
+    }
+
+    .col{
+        background-color:rgba(56, 56, 56, 0.9);
+        }
+ 
+
+    </style>
+</head>
+    <body>
+            <!-- <div "> -->
+        <!-- Begin nav Content -->
+            <div id="navbar" class="navbar sticky-top">
+                <div class="nav-left"><h2>Giphy Maker</h2></div>
+                    <div class="nav-right">
+                        <form>
+                            <input id="new-term" type="text">
+                            <button type="submit" id="search-term">Add search term</button>
+                        </form>
+                    </div> 
+                    <hr>
+                    <div id="btn-row">
+                        
+                        <button type="submit">Test</button>
+                    </div>
+                  </div>
+                
+<!-- Begin main Content -->
+        
+            <br />
+                <div class="container rounded">
+                    <hr>
+                    <div class="row">
+
+                        <!-- <div class="col-sm-12"> -->
+                            <div id="gif-zone">
+
+                            </div>
+                                
+                        <!-- </div> -->
+
+                    </div>
+                </div>
+            </div>
+        <!-- </div> -->
+<!-- End main Content --> 
+
+<!-- <script type="text/javascript" src="assets/javascript/page.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+ <!-- Script -->
+ <script>
+ 
+    // This section creates the buttons and adds new buttons when the user enters a new term
+    
+    // Variable with an array of button values
+    var btnVal = [ "random", "cats", "puppies", "baby elephants" ];
+    // Loops through btnVal array items and makes buttons
+    var mkBtns = function(butnAdder) {
+        console.log(btnVal);
+     $("#btn-row").empty(); 
+        for (var i = 0; i < btnVal.length; i++) {
+            console.log(btnVal[i]);
+                var btnCreate = $("<button>");
+                    $("#btn-row").append(btnCreate);
+                    btnCreate.attr("data-term", btnVal[i]);
+                    btnCreate.attr("class", "searchBtn");
+                    btnCreate.text(btnVal[i]);
+            }
+        }
+    // Takes the value from the input and adds it into the array
+     $("#search-term").on("click", function(event){
+      event.preventDefault();
+      var newTerm = $("#new-term").val().trim();
+      if(newTerm === "") {
+          return;
+      } else {
+        btnVal.push(newTerm);
+        mkBtns();
+      }
+ 
+     })    
+    
+    // Calling the function that makes the buttons to begin with
+    mkBtns();
+
+    $(document).on("click", ".searchBtn", function(event){
+        // Assign the search sting that is in the button that was added to a variable
+        var term = $(this).attr("data-term");
+        // Builds the search query sting with the search term and the API key
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + term + "&api_key=dc6zaTOxFJmzC&limit=10";
+        // Perfoms the Ajax call
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+        }).then(function(response) {
+            // Assigns the response data to variable
+            var results = response.data;
+            // Convert the HTML id gif zone to a variable
+            var gifZone = $("#gif-zone");
+            // Convert the HTML div element to a variable
+            var gifblk = $("<div>");
+            // Loop through the array of results
+            for(var i = 0; i < results.length; i++ ) {
+                // Assign a HTML image tag to he variable gifImg
+                var gifImg = $("<img>");
+                // Create a variable that points to the animated URL of our Gif
+                var gifAnimUrls = results[i].images.fixed_height.url;
+                // Creates a variable that points to the still URL of our Gif
+                var gifStillUrls = results[i].images.fixed_height_still.url;
+                // Add the gigImg tags to the div gifBlk
+                gifblk.append(gifImg);
+                // Add the attribute of the animated URL into the data-animate value
+                gifImg.attr("data-animate", gifAnimUrls)
+                // Add the attribute of the still URL into the data-still value
+                gifImg.attr("data-still", gifStillUrls)
+                // Add the source URL of the still image into the src value of the image tag
+                gifImg.attr("src", gifStillUrls);
+                // Give the image the data-state still value
+                gifImg.attr("data-state", "still");
+                // Give the image the a class with the value of gifs
+                gifImg.attr("class", "gifs");
+                // Add the gifBlk div into the gifZone divs
+                gifZone.append(gifblk);
+                // console.log(gifStillUrls);
+                // console.log(results);
+
+            }
+        });
+    });
+
+    $(document).on("click", ".gifs", function(){
+        // Check the data state on the image and swap it on each click
+        var state = $(this).attr("data-state")
+        // console.log(state);
+        // If its animated assign the animated URL
+        if (state === "still") {
+            $(this).attr('src', $(this).attr('data-animate'));
+            $(this).attr('data-state', "animate");
+        // If its still assign the still URL
+        } else {
+            $(this).attr('src', $(this).attr('data-still'));
+            $(this).attr('data-state', "still");
+        }
+
+    });
+ 
+ </script>
+
+    </body>
+</html>  
+                    

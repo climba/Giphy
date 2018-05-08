@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <style>
+      #container{
+        font-family:monospace;
+        font-weight:bold;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  </head>
+  
+  <body>
+    <h1>
+      Giphy Assignment
+    </h1>
+    
+    <div id="buttons-view"></div>
+    
+    <form id="content-form">
+      <label for="content-input">Add New Genre</label>
+      <input type="text" id="content-input">
+    </form>
+    <input id="add-content" type="submit" value="New Content">
+    
+    <div id="gif-view"></div>
+    
+    <script>
+      
+    
+      // 1. make a array of strings correlating to the genre of meme
+      var topics = [
+        "happy",
+        
+        "sad",
+        
+        "cats",
+        
+        "doge"
+          
+      ];
+      
+
+      renderButton();
+      
+      //deploy gif awesomeness
+      
+      function displayImage() {
+        $("#gif-view").empty();
+        var search = $(this).attr("data-name");
+
+        
+        
+        
+        $.ajax({
+          
+          //limit gif searches to 10 images
+          url: "https://api.giphy.com/v1/gifs/search?q=" + search + "&api_key=dc6zaTOxFJmzC&limit=10",
+          method: "GET"
+        }).then(function(response){
+          console.log(response);
+          var gifs = response.data
+          for (var i = 0; i < gifs.length; i++) {
+          var gifDiv = $("<div>");
+          var p = $("<p>");
+          p.text("Rating: " + gifs[i].rating.toUpperCase());
+          var newGif = $('<img>');
+          newGif.attr("data-animate", gifs[i].images.fixed_height.url)
+          newGif.attr("data-still", gifs[i].images.fixed_height_still.url)
+          newGif.attr("data-state", "animating");
+          newGif.attr('src', gifs[i].images.fixed_height.url);
+          newGif.attr('class', 'clickMe')
+          gifDiv.append(p);
+          gifDiv.append(newGif);  
+          $("#gif-view").append(gifDiv);
+          }
+          
+        });
+       
+      };
+      
+
+      
+      function renderButton(){
+        
+        $("#buttons-view").empty();
+        
+        for (var i = 0; i < topics.length; i ++) {
+          var buttons= $("<button>");
+          buttons.addClass("buttons");
+          buttons.attr("data-name", topics[i]);
+          buttons.text(topics[i]);
+          $("#buttons-view").append(buttons);   
+         
+        }
+        
+      };
+      
+      // add content and convert to new button
+      $("#add-content").on("click", function(event) {
+        event.preventDefault();
+        var content = $("#content-input").val().trim();
+              
+        topics.push(content);
+        console.log(topics);
+
+        renderButton();
+        
+      });
+
+      // Intial render + Click operations 
+      renderButton();
+      $(document).on("click", ".buttons", displayImage);
+      
+      $(document).on("click", ".clickMe", function(){
+        var state = $(this).attr("data-state")
+        console.log(state);
+          if (state === "animating") {
+            $(this).attr('src', $(this).attr('data-still'));
+            $(this).attr('data-state', "still");
+          } else {
+            $(this).attr('src', $(this).attr('data-animate'));
+            $(this).attr('data-state', "animating");
+          }
+
+        });
+      
+     
+      
+    </script>
+    
+  </body>
+</html>
